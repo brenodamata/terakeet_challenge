@@ -2,39 +2,40 @@ namespace :db do
   puts "Fill database with sample data"
 
   task populate: :environment do
-    # require 'populator'
-    # require 'faker'
+    require 'populator'
+    require 'faker'
 
-    # delete only selected
-    # delete_records [Author, Publisher, Genre, Review, BookFormat, BookFormatType, Book]
+    # call this method to delete only selected models
+    delete_records [BookFormat, BookFormatType, BookReview, Book, Author, Publisher, Genre]
 
-    # create_publishers 100
-    # create_genres
-    # create_format_types
+    create_publishers 100
+    create_genres
+    create_format_types
 
-    # Author.populate 100000 do |author|
-    #   author.first_name = Faker::Name.first_name
-    #   author.last_name = Faker::Name.last_name
+    10000.times do
+      author = Author.create(first_name: Faker::Name.first_name, last_name: Faker::Name.last_name)
 
-    #   Book.populate 1..5 do |book|
-    #     Book.name = Faker::Book.title
-    # end
+      rand(1..5).times do
+        book = Book.create(title: Faker::Book.title,
+                           publisher: get_random_publisher,
+                           author: author,
+                           genre: get_random_genre)
 
+        BookReview.populate 100 do |review|
+          review.book_id = book.id
+          review.rating = rand(1..5)
+        end
 
-    # Publisher.populate 100 do |publisher|
-    #   category.name = Populator.words(1..2).titleize
-    #   Product.populate 10..100 do |product|
-    #     product.category_id = category.id
-    #     product.name = Populator.words(1..5).titleize
-    #     product.description = Populator.sentences(2..10)
-    #     product.price = [4.99, 19.95, 100]
-    #     product.created_at = 2.years.ago..Time.now
-    #   end
-    # end
+        BookFormat.populate rand(1..10) do |format|
+          format.book_id = book.id
+          format.book_format_type_id = get_random_book_format_type.id
+        end
+      end
+    end
   end
 
   def delete_records models
-    modeles.each(&:delete_all)
+    models.each(&:delete_all)
   end
 
   def create_publishers number
@@ -53,7 +54,21 @@ namespace :db do
   end
 
   def create_format_types
-    ['Hardcover', 'Softcover', 'Kindle', 'PDF']
+    {Hardcover: true, Softcover: true, Kindle: false, PDF: false,
+     Audiobook: false, Bunkobon: true, Chapbook: true, Paperback: true,
+     Folio: true, Octavo: true}.each { |type, physical| BookFormatType.create(name: type, physical: physical) }
+  end
+
+  def get_random_publisher
+    Publisher.offset(rand(Publisher.count)).first
+  end
+
+  def get_random_genre
+    Genre.offset(rand(Genre.count)).first
+  end
+
+  def get_random_book_format_type
+    BookFormatType.offset(rand(BookFormatType.count)).first
   end
 
 end

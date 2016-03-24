@@ -3,6 +3,7 @@ class BookFormatType < ActiveRecord::Base
   has_many :books, through: :book_formats
 
   validates :name, presence: true
+  validates :name, uniqueness: true
 
   before_create :set_defualt_physical
 
