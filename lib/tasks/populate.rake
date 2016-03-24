@@ -6,11 +6,12 @@ namespace :db do
     require 'faker'
 
     # call this method to delete only selected models
-    delete_records [BookFormat, BookFormatType, BookReview, Book, Author, Publisher, Genre]
+    # delete_records [BookFormat, BookFormatType, BookReview, Book, Author, Publisher, Genre]
+    delete_records [BookFormat, BookReview, Book, Author]
 
-    create_publishers 100
-    create_genres
-    create_format_types
+    # create_publishers 100
+    # create_genres
+    # create_format_types
 
     10000.times do
       author = Author.create(first_name: Faker::Name.first_name, last_name: Faker::Name.last_name)
@@ -26,9 +27,14 @@ namespace :db do
           review.rating = rand(1..5)
         end
 
-        BookFormat.populate rand(1..10) do |format|
-          format.book_id = book.id
-          format.book_format_type_id = get_random_book_format_type.id
+        # Can't repeat format type
+        type_ids = []
+        BookFormatType.all.each do |type|
+          type_ids << type.id
+        end
+        # Associate to random format types without repeating
+        type_ids.shuffle.drop(rand(0..9)).each do |type_id|
+          BookFormat.create(book: book, book_format_type: get_book_format_type(type_id))
         end
       end
     end
@@ -67,8 +73,8 @@ namespace :db do
     Genre.offset(rand(Genre.count)).first
   end
 
-  def get_random_book_format_type
-    BookFormatType.offset(rand(BookFormatType.count)).first
+  def get_book_format_type(id)
+    BookFormatType.find(id)
   end
 
 end
