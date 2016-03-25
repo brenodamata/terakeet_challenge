@@ -13,9 +13,7 @@ class Book < ActiveRecord::Base
   validates :publisher_id, presence: true
 
   def format_types
-    types = []
-    book_format_types.each { |type| types << type.name }
-    types.join(', ')
+    book_format_types.map(&:name).join(', ')
   end
 
   def author_name
@@ -23,7 +21,6 @@ class Book < ActiveRecord::Base
   end
 
   def average_rating
-    ratings = self.book_reviews.map { |review| review.rating }
-    ratings.inject(0){|sum,x| sum + x }.to_f / ratings.size
+    book_reviews.map(&:rating).inject(0) { |sum, x| sum + x }.to_f / book_reviews.size
   end
 end
