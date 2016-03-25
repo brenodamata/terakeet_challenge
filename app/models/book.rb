@@ -41,9 +41,14 @@ class Book < ActiveRecord::Base
 #     field matches the supplied argument. This filter is not applied if the argument is not present or nil.
 # Book.search('',{:title_only=>true, :book_format_type_id=>[151,157,160], :book_format_physical=>true})
   def self.search(query, options)
-    options[:title_only] ? title_only = true : title_only = false
-    options[:book_format_type_id] ? type_ids = options[:book_format_type_id] : type_ids = nil
-    options[:book_format_physical] ? physical = options[:book_format_physical] : physical = nil
+    if options.nil?
+      title_only = false
+      type_ids, physical = nil
+    else
+      options[:title_only] ? title_only = true : title_only = false
+      options[:book_format_type_id] ? type_ids = options[:book_format_type_id] : type_ids = nil
+      options[:book_format_physical] ? physical = options[:book_format_physical] : physical = nil
+    end
 
     conditions =  condition_query(title_only)
 
