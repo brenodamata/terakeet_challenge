@@ -41,43 +41,47 @@ class Book < ActiveRecord::Base
 #     field matches the supplied argument. This filter is not applied if the argument is not present or nil.
 # Book.search('',{:title_only=>true, :book_format_type_id=>[151,157,160], :book_format_physical=>true})
   def self.search(query, options)
-    if options.nil?
-      title_only = false
-      type_ids, physical = nil
-    else
-      options[:title_only] ? title_only = true : title_only = false
-      options[:book_format_type_id] ? type_ids = options[:book_format_type_id] : type_ids = nil
-      options[:book_format_physical] ? physical = options[:book_format_physical] : physical = nil
-    end
-
-    conditions =  condition_query(title_only)
-
-    if !physical.nil? and type_ids
-      # only book formats selected and acording to it's physical boolean
-      ids = options[:book_format_type_id] & BookFormatType.where(physical: physical).pluck(:id)
-    elsif physical.nil? and type_ids
-      # only book formats selected
-      ids = options[:book_format_type_id]
-    elsif !physical.nil? and type_ids.nil?
-      # only the book formats acording to it's physical boolean
-      ids = BookFormatType.where(physical: physical).pluck(:id)
-    else
-      ids = nil
-    end
-
-    begin
-      if title_only and ids.nil?
-        find(:all, :conditions => conditions)
-      elsif !title_only and ids.nil?
-        self.joins(:author).joins(:publisher).where(conditions, "%#{query.downcase}%", query.downcase, query.downcase)
-      elsif title_only and ids
-        self.joins(:book_format_types).where("book_format_types.id IN (#{ids.join(', ')})")
-      elsif !title_only and ids
-        conditions = "(#{conditions}) AND book_format_types.id IN (#{ids.join(', ')})"
-        self.joins(:author).joins(:publisher).joins(:book_format_types).where(conditions, "%#{query.downcase}%", query.downcase, query.downcase)
+    if query
+      if options.nil?
+        title_only = false
+        type_ids, physical = nil
+      else
+        options[:title_only] ? title_only = true : title_only = false
+        options[:book_format_type_id] ? type_ids = options[:book_format_type_id] : type_ids = nil
+        options[:book_format_physical] ? physical = options[:book_format_physical] : physical = nil
       end
-    rescue
-      Book.none # Did not find any books matching search criteria
+
+      conditions =  condition_query(title_only)
+
+      if !physical.nil? and type_ids
+        # only book formats selected and acording to it's physical boolean
+        ids = options[:book_format_type_id] & BookFormatType.where(physical: physical).pluck(:id)
+      elsif physical.nil? and type_ids
+        # only book formats selected
+        ids = options[:book_format_type_id]
+      elsif !physical.nil? and type_ids.nil?
+        # only the book formats acording to it's physical boolean
+        ids = BookFormatType.where(physical: physical).pluck(:id)
+      else
+        ids = nil
+      end
+
+      begin
+        if title_only and ids.nil?
+          find(:all, :conditions => conditions)
+        elsif !title_only and ids.nil?
+          self.joins(:author).joins(:publisher).where(conditions, "%#{query.downcase}%", query.downcase, query.downcase)
+        elsif title_only and ids
+          self.joins(:book_format_types).where("book_format_types.id IN (#{ids.join(', ')})")
+        elsif !title_only and ids
+          conditions = "(#{conditions}) AND book_format_types.id IN (#{ids.join(', ')})"
+          self.joins(:author).joins(:publisher).joins(:book_format_types).where(conditions, "%#{query.downcase}%", query.downcase, query.downcase)
+        end
+      rescue
+        Book.none # Did not find any books matching search criteria
+      end
+    else
+      all
     end
   end
 

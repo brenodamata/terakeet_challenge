@@ -1,4 +1,4 @@
 Rails.application.routes.draw do
   root 'books#index'
-  post 'books', to: 'books#search'
+  get 'books', to: 'books#index'
 end

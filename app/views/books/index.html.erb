@@ -3,8 +3,8 @@
   <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
 </div>
 
-<%= form_for @book do |f| %>
-  <p> <%= f.text_field :title %> <%= f.submit "Search" %> </p>
+<%= form_for books_path, method: 'get' do  %>
+  <p> <%= text_field_tag :search, params[:search] %> <%= submit_tag "Search", name: nil %> </p>
 <% end %>
 
 <%= will_paginate @books %>
@@ -16,6 +16,7 @@
       <th><%= model_class.human_attribute_name(:publisher_id) %></th>
       <th><%= model_class.human_attribute_name(:author_id) %></th>
       <th><%= model_class.human_attribute_name(:genre_id) %></th>
+      <th><%= model_class.human_attribute_name(:rating) %></th>
     </tr>
   </thead>
   <tbody>
@@ -25,6 +26,7 @@
         <td><%= book.publisher.name %></td>
         <td><%= book.author.name %></td>
         <td><%= book.genre.name %></td>
+        <td><%= book.average_rating %></td>
       </tr>
     <% end %>
   </tbody>
