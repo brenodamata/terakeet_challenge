@@ -4,8 +4,26 @@
 </div>
 
 <%= form_for books_path, method: 'get' do  %>
-  <p> <%= text_field_tag :search, params[:search] %> <%= submit_tag "Search", name: nil %> </p>
+  <p> <%= text_field_tag :search, params[:search] %> <%= check_box_tag 'title_only', 'yes', false %> Title only <%= submit_tag "Search", name: nil %> </p>
+
+  <!-- <p><%#= check_box_tag 'physical', 'yes', false %> Only Physical books</p> -->
+  <p><%= radio_button_tag 'physical', 'yes', false %> Physical only formats
+  <%= radio_button_tag 'physical', 'no', false %> Digital only formats</p>
+  <%= collection_check_boxes(:book, :book_format_type_ids, BookFormatType.all, :id, :name) do |b| %>
+    <%= b.check_box %>
+    <%= b.label %>
+  <% end %>
+
+
+  <%#= collection_check_boxes :book_format_type_ids, BookFormatType.all, :id, :name do |b| %>
+  <!-- <div class="collection-check-box">
+    <%#= b.check_box %>
+    <%#= b.label %>
+  </div> -->
+  <%# end %>
 <% end %>
+
+
 
 <%= will_paginate @books %>
 

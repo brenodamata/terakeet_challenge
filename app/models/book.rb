@@ -39,7 +39,6 @@ class Book < ActiveRecord::Base
 # :book_format_physical(defaults to nil).
 #     If supplied as true or false, only return books that are available in a format whose “physical”
 #     field matches the supplied argument. This filter is not applied if the argument is not present or nil.
-# Book.search('',{:title_only=>true, :book_format_type_id=>[151,157,160], :book_format_physical=>true})
   def self.search(query, options)
     if query
       if options.nil?
