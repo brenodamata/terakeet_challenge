@@ -11,4 +11,8 @@ class Author < ActiveRecord::Base
   def last_name_first
     "#{last_name}, #{first_name}"
   end
+
+  def books_by_rating
+    self.books.select("DISTINCT books.*, AVG(book_reviews.rating) AS rating").joins(:book_reviews).group("books.id").order("rating DESC")
+  end
 end

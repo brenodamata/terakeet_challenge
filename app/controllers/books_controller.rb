@@ -11,17 +11,17 @@ class BooksController < ApplicationController
 
   def publisher
     @publisher = Publisher.find(params[:publisher_id])
-    @books = @publisher.books.paginate(:page => params[:page], :per_page => 10)
+    @books = @publisher.books_by_rating.paginate(:page => params[:page], :per_page => 10)
   end
 
   def genre
     @genre = Genre.find(params[:genre_id])
-    @books = @genre.books.paginate(:page => params[:page], :per_page => 10)
+    @books = @genre.books_by_rating.paginate(:page => params[:page], :per_page => 10)
   end
 
   def author
     @author = Author.find(params[:author_id])
-    @books = @author.books.paginate(:page => params[:page], :per_page => 10)
+    @books = @author.books_by_rating.paginate(:page => params[:page], :per_page => 10)
   end
 
 protected
