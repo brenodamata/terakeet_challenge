@@ -24,22 +24,15 @@ class Book < ActiveRecord::Base
     book_reviews.map(&:rating).inject(0) { |sum, x| sum + x }.to_f / book_reviews.size
   end
 
-# Returns a collection of books that match the query string, subject to the following rules:
-# 1. If the last name of the author matches the query string exactly (case insensitive)
-# 2. If the name of the publisher matches the query string exactly (case insensitive)
-# 3. If any portion of the book’s title matches the query string (case insensitive)
-# The results should be the union of books that match any of these three rules.
+  def digital_only?
+
+  end
+
+
 # The results should be ordered by average rating, with the highest rating first.
 # The list should be unique (the same book shouldn't appear multiple times in the results)
-# Search options:
-# :title_only(defaults to false).
-#     If true, only return results from rule #3 above.
-# :book_format_type_id(defaults to nil).
-#     If true, only return books that are available in a format that matches the supplied type id.
-# :book_format_physical(defaults to nil).
-#     If supplied as true or false, only return books that are available in a format whose “physical”
-#     field matches the supplied argument. This filter is not applied if the argument is not present or nil.
   def self.search(query, options)
+    byebug
     if query
       if options.nil?
         title_only = false
@@ -47,17 +40,21 @@ class Book < ActiveRecord::Base
       else
         options[:title_only] ? title_only = true : title_only = false
         options[:book_format_type_id] ? type_ids = options[:book_format_type_id] : type_ids = nil
-        options[:book_format_physical] ? physical = options[:book_format_physical] : physical = nil
+        if options[:book_format_physical].nil?
+          physical = nil
+        else
+          physical = options[:book_format_physical]
+        end
       end
 
       conditions =  condition_query(title_only)
 
       if !physical.nil? and type_ids
         # only book formats selected and acording to it's physical boolean
-        ids = options[:book_format_type_id] & BookFormatType.where(physical: physical).pluck(:id)
+        ids = options[:book_format_type_id].map(&:to_i) & BookFormatType.where(physical: physical).pluck(:id)
       elsif physical.nil? and type_ids
         # only book formats selected
-        ids = options[:book_format_type_id]
+        ids = options[:book_format_type_id].map(&:to_i)
       elsif !physical.nil? and type_ids.nil?
         # only the book formats acording to it's physical boolean
         ids = BookFormatType.where(physical: physical).pluck(:id)
