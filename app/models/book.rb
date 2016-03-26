@@ -5,7 +5,7 @@ class Book < ActiveRecord::Base
 
   has_many :book_reviews
   has_many :book_formats
-  has_many :book_format_types, through: :book_formats
+  has_many :book_format_types, -> { distinct }, through: :book_formats
 
   validates :title, presence: true
   validates :genre_id, presence: true
@@ -28,11 +28,8 @@ class Book < ActiveRecord::Base
 
   end
 
-
-# The results should be ordered by average rating, with the highest rating first.
 # The list should be unique (the same book shouldn't appear multiple times in the results)
   def self.search(query, options)
-    byebug
     if query
       if options.nil?
         title_only = false
@@ -71,7 +68,7 @@ class Book < ActiveRecord::Base
           self.joins(:book_format_types).where("book_format_types.id IN (#{ids.join(', ')})")
         elsif !title_only and ids
           conditions = "(#{conditions}) AND book_format_types.id IN (#{ids.join(', ')})"
-          self.joins(:author).joins(:publisher).joins(:book_format_types).where(conditions, "%#{query.downcase}%", query.downcase, query.downcase)
+          self.select("DISTINCT books.*").joins(:author).joins(:publisher).joins(:book_format_types).where(conditions, "%#{query.downcase}%", query.downcase, query.downcase)
         end
       rescue
         Book.none # Did not find any books matching search criteria

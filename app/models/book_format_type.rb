@@ -1,6 +1,6 @@
 class BookFormatType < ActiveRecord::Base
   has_many :book_formats
-  has_many :books, through: :book_formats
+  has_many :books, -> { distinct }, through: :book_formats
 
   validates :name, presence: true
   validates :name, uniqueness: true

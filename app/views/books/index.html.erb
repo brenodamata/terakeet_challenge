@@ -27,6 +27,7 @@
       <th><%= model_class.human_attribute_name(:author_id) %></th>
       <th><%= model_class.human_attribute_name(:genre_id) %></th>
       <th><%= model_class.human_attribute_name(:rating) %></th>
+      <th><%= model_class.human_attribute_name(:book_format_types) %></th>
     </tr>
   </thead>
   <tbody>
@@ -37,6 +38,7 @@
         <td><%= book.author.name %></td>
         <td><%= book.genre.name %></td>
         <td><%= book.average_rating %></td>
+        <td><%= book.format_types %></td>
       </tr>
     <% end %>
   </tbody>
