@@ -1,0 +1,8 @@
+<%- model_class = Book -%>
+<div class="page-header">
+  <h1><%= "#{@author.name}'s books" %></h1>
+</div>
+
+<%= link_to 'Search', root_path %>
+
+<%= render 'list' %>

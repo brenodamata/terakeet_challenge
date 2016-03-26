@@ -1,0 +1,26 @@
+<%= will_paginate @books %>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Publisher</th>
+      <th>Author</th>
+      <th>Genre</th>
+      <th>Rating</th>
+      <th>Available in</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @books.each do |book| %>
+      <tr>
+        <td><%= book.title %></td>
+        <td><%= link_to book.publisher.name, publisher_books_path(book.publisher) %></td>
+        <td><%= link_to book.author.name, author_books_path(book.author) %></td>
+        <td><%= link_to book.genre.name, genre_books_path(book.genre) %></td>
+        <td><%= book.average_rating %></td>
+        <td><%= book.format_types %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
