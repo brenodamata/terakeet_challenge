@@ -28,7 +28,6 @@ class Book < ActiveRecord::Base
 
   end
 
-# The list should be unique (the same book shouldn't appear multiple times in the results)
   def self.search(query, options)
     if query
       if options.nil?
@@ -61,20 +60,21 @@ class Book < ActiveRecord::Base
 
       begin
         if title_only and ids.nil?
-          find(:all, :conditions => conditions)
+          self.select("DISTINCT books.*, AVG(book_reviews.rating) AS rating").joins(:book_reviews).where(conditions, "%#{query.downcase}%").group("books.id").order("rating DESC")
         elsif !title_only and ids.nil?
-          self.joins(:author).joins(:publisher).where(conditions, "%#{query.downcase}%", query.downcase, query.downcase)
+          self.select("DISTINCT books.*, AVG(book_reviews.rating) AS rating").joins(:book_reviews).joins(:author).joins(:publisher).where(conditions, "%#{query.downcase}%", query.downcase, query.downcase).group("books.id").order("rating DESC")
         elsif title_only and ids
-          self.joins(:book_format_types).where("book_format_types.id IN (#{ids.join(', ')})")
+          conditions += " AND book_format_types.id IN (#{ids.join(', ')})"
+          self.select("DISTINCT books.*, AVG(book_reviews.rating) AS rating").joins(:book_reviews).joins(:book_format_types).where(conditions, "%#{query.downcase}%").group("books.id").order("rating DESC")
         elsif !title_only and ids
           conditions = "(#{conditions}) AND book_format_types.id IN (#{ids.join(', ')})"
-          self.select("DISTINCT books.*").joins(:author).joins(:publisher).joins(:book_format_types).where(conditions, "%#{query.downcase}%", query.downcase, query.downcase)
+          self.select("DISTINCT books.*, AVG(book_reviews.rating) AS rating").joins(:book_reviews).joins(:author).joins(:publisher).joins(:book_format_types).where(conditions, "%#{query.downcase}%", query.downcase, query.downcase).group("books.id").order("rating DESC")
         end
       rescue
-        Book.none # Did not find any books matching search criteria
+        none # Did not find any books matching search criteria
       end
     else
-      all
+      self.select("DISTINCT books.*, AVG(book_reviews.rating) AS rating").joins(:book_reviews).group("books.id").order("rating DESC")
     end
   end
 
