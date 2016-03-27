@@ -4,15 +4,17 @@
 </div>
 
 <%= form_for books_path, method: 'get' do  %>
-  <p> <%= text_field_tag :search, params[:search] %> <%= check_box_tag 'title_only', 'yes', false %> Title only <%= submit_tag "Search", name: nil %> </p>
+  <p> <%= text_field_tag :search, params[:search] %> <%= check_box_tag 'title_only', 'yes', false %> Title only <%= submit_tag "Search", name: nil, :class => 'btn btn-primary'  %> </p>
 
-  <!-- <p><%#= check_box_tag 'physical', 'yes', false %> Only Physical books</p> -->
+<a href="javascript:hideshow(document.getElementById('options'))" id="show_hide">Search options</a>
+<div id="options" style="display: none">
   <p><%= radio_button_tag 'physical', 'yes', false %> Physical only formats
   <%= radio_button_tag 'physical', 'no', false %> Digital only formats</p>
   <%= collection_check_boxes(:book, :book_format_type_ids, BookFormatType.all, :id, :name) do |b| %>
     <%= b.check_box %>
     <%= b.label %>
   <% end %>
+  </div>
 <% end %>
 
 <%= render 'list' %>
