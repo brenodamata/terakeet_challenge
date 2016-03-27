@@ -7,24 +7,22 @@ namespace :db do
 
     # call this method to delete only selected models
     # delete_records [BookFormat, BookFormatType, BookReview, Book, Author, Publisher, Genre]
-    # delete_records [BookFormat, BookReview, Book, Author]
+    delete_records [BookFormat, BookReview, Book, Author, Publisher]
 
-    create_publishers 100
-    create_genres
-    create_format_types
+    create_publishers 50
+    # create_genres
+    # create_format_types
 
-    500.times do
-      puts "#{(Author.count/1000.0).round(2)}% done." if (Author.count/1000.0).round(2) % 1 == 0
-
+    400.times do
       author = Author.create(first_name: Faker::Name.first_name, last_name: Faker::Name.last_name)
 
-      rand(1..5).times do
+      rand(1..4).times do
         book = Book.create(title: Faker::Book.title,
                            publisher: get_random_publisher,
                            author: author,
                            genre: get_random_genre)
 
-        BookReview.populate 100 do |review|
+        BookReview.populate 5 do |review|
           review.book_id = book.id
           review.rating = rand(1..5)
         end
