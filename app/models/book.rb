@@ -24,10 +24,6 @@ class Book < ActiveRecord::Base
     book_reviews.map(&:rating).inject(0) { |sum, x| sum + x }.to_f / book_reviews.size
   end
 
-  def digital_only?
-
-  end
-
   def self.search(query, options)
     if query
       if options.nil?
@@ -74,8 +70,20 @@ class Book < ActiveRecord::Base
         none # Did not find any books matching search criteria
       end
     else
-      self.select("DISTINCT books.*, AVG(book_reviews.rating) AS rating").joins(:book_reviews).group("books.id").order("rating DESC")
+      all_by_rating "DESC"
     end
+  end
+
+  def self.highest_rating
+    all_by_rating("DESC").first
+  end
+
+  def self.lowest_rating
+    all_by_rating("ASC").first
+  end
+
+  def self.all_by_rating order
+    self.select("DISTINCT books.*, AVG(book_reviews.rating) AS rating").joins(:book_reviews).group("books.id").order("rating #{order}")
   end
 
 private

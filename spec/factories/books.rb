@@ -22,4 +22,12 @@ FactoryGirl.define do
     end
 
   end
+
+  factory :book2, class: Book do
+    title "The Other One"
+    association :publisher, name: "Letras"
+    association :genre, name: "Comic"
+    association :author, first_name: "Paulo"
+  end
+
 end

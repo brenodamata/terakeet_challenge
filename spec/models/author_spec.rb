@@ -22,7 +22,6 @@ RSpec.describe Author, :type => :model do
   end
   it "has last name first" do
     author = build :author
-    full_name = "#{author.last_name}, #{author.first_name}"
-    expect(full_name).to eq(author.last_name_first)
+    expect("#{author.last_name}, #{author.first_name}").to eq(author.last_name_first)
   end
 end
