@@ -6,12 +6,11 @@ namespace :db do
     require 'faker'
 
     # call this method to delete only selected models
-    # delete_records [BookFormat, BookFormatType, BookReview, Book, Author, Publisher, Genre]
-    delete_records [BookFormat, BookReview, Book, Author, Publisher]
+    delete_records [BookFormat, BookFormatType, BookReview, Book, Author, Publisher, Genre]
 
     create_publishers 50
-    # create_genres
-    # create_format_types
+    create_genres
+    create_format_types
 
     400.times do
       author = Author.create(first_name: Faker::Name.first_name, last_name: Faker::Name.last_name)
